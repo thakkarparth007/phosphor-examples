@@ -36,7 +36,8 @@ function run_example {
    local taint_sink=$3
    local src=$4
    local dest_folder=$5
-   java -jar $phosphor_jar -taintSources $taint_src -taintSinks $taint_sink $src $dest_folder
+   echo java -jar $phosphor_jar -taintSources $taint_src -taintSinks $taint_sink $src $dest_folder
+   exit;
  }
 
 function help {
@@ -67,11 +68,11 @@ if [ ! -d $1 ]
   exit 1
 fi
 
-JRE_INT=${1}/jre-inst-int
+# JRE_INT=${1}/jre-inst-int
 JRE_OBJ=${1}/jre-inst-obj
-JRE_IMP=${1}/jre-inst-implicit
+# JRE_IMP=${1}/jre-inst-implicit
 PHOSPHOR_JAR=$(find $1 -iname "Phosphor-[0-9]*SNAPSHOT.jar")
-EXAMPLES_JAR=$(find ./target -depth 1 -iname "phosphor-examples-*SNAPSHOT.jar")
+EXAMPLES_JAR=$(find ./target -maxdepth 1 -iname "phosphor-examples-*SNAPSHOT.jar")
 
 if [ -z $PHOSPHOR_JAR ]
   then
@@ -90,11 +91,11 @@ fi
 inst_jar $PHOSPHOR_JAR src/main/resources/taint-sources src/main/resources/taint-sinks $EXAMPLES_JAR target/inst_examples/
 INST_EXAMPLES_JAR=$(find target/inst_examples/ -iname "phosphor-examples-*SNAPSHOT.jar")
 
-run_example $JRE_INT $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.IntegerTagExamples
-run_example $JRE_OBJ $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.ObjectTagExamples
-run_example $JRE_IMP $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.ImplicitFlowsExamples
+run_example $JRE_OBJ $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.IntegerTagExamples
+# run_example $JRE_OBJ $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.ObjectTagExamples
+# run_example $JRE_IMP $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.ImplicitFlowsExamples
 # only runnning with integer tags, but the idea is the same for other cases
-run_example $JRE_INT $PHOSPHOR_JAR $INST_EXAMPLES_JAR com.josecambronero.AutoExample
+# run_example $JRE_INT $PHOSPHOR_JAR $INST_EXAMPLES_JAR com.josecambronero.AutoExample
 # this doesn't seem to work, requires pre-instrumented JAR
 echo "==> Autoexample fails (i.e. no exception) with non-pre-instrumented jar"
 run_example $JRE_INT $PHOSPHOR_JAR $EXAMPLES_JAR com.josecambronero.AutoExample\
